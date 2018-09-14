@@ -28,10 +28,8 @@ def login():
     
     stock_symbol = request.form['name']
         
-    
     return render_template('login.html',\
-                           form = form,\
+                           form = form,
                            result = stock_symbol)
-
 
 
