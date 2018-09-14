@@ -7,29 +7,27 @@ Created on Fri Sep 14 20:42:51 2018
 """
 
 from flask import Flask, render_template, request
-
-app = Flask(__name__)
-
-@app.route('/index/')
-def main(name = 'anna'):
-    return render_template('index.html',name = name)
-
-
-
 from wtforms import Form, StringField
 
 class stock_search_form(Form):
-    name = StringField('Name:')
+    name = StringField('Stock symbol:')
+    
+    
 
+app = Flask(__name__)
 
-@app.route('/login/', methods=['POST', 'GET'])
-def login():
+@app.route('/index/', methods=['POST', 'GET'])
+def main():
     form = stock_search_form(request.form)
     
-    stock_symbol = request.form['name']
-        
-    return render_template('login.html',\
+    if request.method == 'POST':
+        stock_symbol = request.form['name']
+    else:
+        stock_symbol = 'not selected'
+    
+    return render_template('index.html',\
                            form = form,
                            result = stock_symbol)
+
 
 
