@@ -18,16 +18,31 @@
 
 <!-- BODY -->
 <form class="w3-container" method="post">
+
+  <!-- Stock symbol picker-->
   <div class="input text w3-text-teal w3-margin-top w3-margin-bottom">
                 {{ form.name.label }} {{ form.name }}
   </div>
 
+  <!-- Start date picker-->
+  <div class="input text w3-text-teal w3-margin-top w3-margin-bottom">
+                {{ form.start_date.label }} {{ form.start_date }}
+  </div>
+
+  <!-- End date picker-->
+  <div class="input text w3-text-teal w3-margin-top w3-margin-bottom">
+                {{ form.end_date.label }} {{ form.end_date }}
+  </div>
+
+  <!-- Submit button-->
   <div class="input submit">
                 <input class = "w3-blue-grey w3-btn" type="submit" value="Search" />
   </div>
 
+
+  <!-- debug-->
   <p>The stock you are looking for is {{result}}</p>
-  
+
 </form>
 
 
