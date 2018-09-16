@@ -36,9 +36,11 @@ def main():
         
     else:
         required_stock = 'not selected'
+        stock_symbol = 'not_selected'
     
     return render_template('index.html',\
                            form = form,
+                           stock_symbol = stock_symbol,
                            result = required_stock)
     
     

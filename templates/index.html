@@ -7,11 +7,11 @@
 <!-- HEADER -->
 
 <div class="w3-container w3-teal">
-  <h1>Stocking Tracking App</h1>
+  <h1>Stock Tracking App</h1>
 </div>
 
 <div class="w3-container">
-  <p>You are never gonna beat me in understanding the market!</p>
+  <p>Source: idx NYSE</p>
 </div>
 
 
@@ -21,18 +21,13 @@
 
   <!-- Stock symbol picker-->
   <div class="input text w3-text-teal w3-margin-top w3-margin-bottom">
-                {{ form.name.label }} {{ form.name }}
-  </div>
-
+                {{ form.name.label }} {{ form.name }}</div>
   <!-- Start date picker-->
   <div class="input text w3-text-teal w3-margin-top w3-margin-bottom">
-                {{ form.start_date.label }} {{ form.start_date }}
-  </div>
-
+                {{ form.start_date.label }} {{ form.start_date }}</div>
   <!-- End date picker-->
   <div class="input text w3-text-teal w3-margin-top w3-margin-bottom">
-                {{ form.end_date.label }} {{ form.end_date }}
-  </div>
+                {{ form.end_date.label }} {{ form.end_date }}</div>
 
   <!-- Submit button-->
   <div class="input submit">
@@ -41,11 +36,113 @@
 
 
   <!-- debug-->
-  <p>The stock you are looking for is {{result}}</p>
+  <!-- <p>The stock you are looking for is {{result}}</p> -->
 
 </form>
 
 
+
+<!--D3 CHART -->
+<svg width="600" height="450"></svg>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+// Fetch data from Python
+var data = {{ result|safe }}
+
+// Create svg canvas
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 80, bottom: 30, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform",
+                            "translate(" + margin.left + "," + margin.top + ")");
+// console.log(data)
+
+// Handler for domains of axes
+// format dates
+var parseTime = d3.timeParse("%Y-%m-%d");
+for(var i = 0; i < Object.keys(data).length; i++){
+  data[i]['date'] = parseTime(data[i]['date']);
+};
+
+
+var x = d3.scaleTime().rangeRound([0, width]),
+    y = d3.scaleLinear().rangeRound([height, 0]);
+    z = d3.scaleOrdinal(d3.schemeCategory10); // legend dimension
+
+var line = d3.line()
+    .curve(d3.curveBasis)
+    .x(function(d) { return x(d['date']); })
+    .y(function(d) { return y(d.price); });
+
+// console.log(Object.keys(data[0]));
+// Keys to be displayed (will later be changed according to dropdown lists)
+var dataKeys = Object.keys(data[0]);
+// Slice the data for attributes (date and volumn excluded)
+var categories = dataKeys.slice(1,-1).map(function(id) {
+    return {
+      id: id,
+      values: data.map(function(d) {
+        return {date: d.date, price: d[id]};
+      })
+    };
+  });
+
+x.domain(d3.extent(data, function(d) { return d.date; }));
+y.domain([
+    d3.min(categories, function(c) { return d3.min(c.values,
+                                    function(d) { return d.price; }); }),
+    d3.max(categories, function(c) { return d3.max(c.values,
+                                    function(d) { return d.price; }); })
+  ]);
+z.domain(categories.map(function(c) { return c.id; }));
+
+// Create x-axis
+g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+  .select(".domain")
+    .remove();
+
+// Create y-axis
+g.append("g")
+    .call(d3.axisLeft(y))
+  .append("text")
+    .attr("fill", "#000")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", "0.71em")
+    .attr("text-anchor", "end")
+    .text("Price ($)");
+
+// Plot paths
+
+var category = g.selectAll(".category")
+    .data(categories)
+    .enter().append("g")
+      .attr("class", "category");
+
+  category.append("path")
+      .attr("class", "line")
+      .attr("fill", "none")
+      .attr("stroke-width", 2)
+      .attr("d", function(d) { return line(d.values); })
+      .attr("stroke", function(d) { return z(d.id); });
+
+  category.append("text")
+      .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.price) + ")"; })
+      .attr("x", 3)
+      .attr("dy", "0.35em")
+      //.style("font", "10px sans-serif")
+      .attr("fill", function(d) { return z(d.id); })
+      .text(function(d) { return d.id; });
+
+
+
+</script>
 
 
 
@@ -58,5 +155,5 @@
 
 <!-- FOOTER -->
 <div class="w3-container w3-teal">
-  <p>来自Kiki Tang莫名其妙的灵感</p>
+  <p>2018</p>
 </div>

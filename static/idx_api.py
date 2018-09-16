@@ -34,13 +34,13 @@ class stock(object):
         high, low, close prices
         '''
         
+        from datetime import datetime
+        from iexfinance import get_historical_data
         
         
         # parse the time
         #---------------
-        
-        from datetime import datetime
-        from iexfinance import get_historical_data
+
         
         start_date_parsed = \
             datetime(int(start_date.split('-')[0]),\
@@ -52,14 +52,28 @@ class stock(object):
                      int(end_date.split('-')[1]),\
                      int(end_date.split('-')[2]))
             
+            
+        # get data from idx
+        #------------------
+        
+        
         df = get_historical_data(self.symbol, 
                          start=start_date_parsed, 
                          end=end_date_parsed, 
                          output_format='pandas')
         
-        return df.reset_index().to_json(orient='records')
+        
+        
+        # parse to json
+        #--------------
+        
+        json_str = df.reset_index()\
+            .to_json(orient='records')
+        
+        return json_str
         
         
         
 #baba = stock('BABA')
-#print(baba.get_data('01-08-2017','03-08-2017'))
+#print(baba)
+#print(baba.get_data('2018-01-01','2018-01-02'))
